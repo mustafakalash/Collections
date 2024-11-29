@@ -1,6 +1,8 @@
+using FFXIVClientStructs.FFXIV.Component.Excel;
+
 namespace Collections;
 
-public abstract class Collectible<T> : ICollectible where T : ExcelRow
+public abstract class Collectible<T> : ICollectible where T : struct, IExcelRow<T>
 {
     public string Name { get; init; }
     public uint Id { get; init; }

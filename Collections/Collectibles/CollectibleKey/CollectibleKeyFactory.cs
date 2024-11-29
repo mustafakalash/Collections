@@ -1,8 +1,10 @@
+using FFXIVClientStructs.FFXIV.Component.Excel;
+
 namespace Collections;
 
 public class CollectibleKeyFactory
 {
-    public static ICollectibleKey Get<T>(Collectible<T> collectible) where T : ExcelRow
+    public static ICollectibleKey Get<T>(Collectible<T> collectible) where T : struct, IExcelRow<T>
     {
         var type = typeof(T);
         var keysDataGenerator = Services.DataGenerator.KeysDataGenerator;

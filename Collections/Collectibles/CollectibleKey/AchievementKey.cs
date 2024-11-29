@@ -1,3 +1,4 @@
+
 namespace Collections;
 
 public class AchievementKey : CollectibleKey<(Achievement, bool)>, ICreateable<AchievementKey, (Achievement, bool)>
@@ -13,7 +14,7 @@ public class AchievementKey : CollectibleKey<(Achievement, bool)>, ICreateable<A
 
     protected override string GetName((Achievement, bool) input)
     {
-        return input.Item1.Name;
+        return input.Item1.Name.ToString();
     }
 
     protected override uint GetId((Achievement, bool) input)

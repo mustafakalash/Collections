@@ -1,52 +1,44 @@
+using FFXIVClientStructs.FFXIV.Client.UI.Misc;
+
 namespace Collections;
 
 [Sheet("SpecialShop")]
-public class SpecialShopAdapter : SpecialShop
+public struct SpecialShopAdapter : IExcelRow<SpecialShopAdapter>
 {
-    public override void PopulateData(RowParser parser, Lumina.GameData lumina, Language language)
+    public SpecialShop SpecialShop { get; set; }
+    public uint RowId => SpecialShop.RowId;
+    public static SpecialShopAdapter Create(ExcelPage page, uint offset, uint row) => new SpecialShopAdapter(page, offset, row);
+    public SpecialShopAdapter(ExcelPage page, uint offset, uint row)
     {
-        base.PopulateData(parser, lumina, language);
-        var x = UseCurrencyType;
-        for (var i = 0; i < 60; i++)
+        SpecialShop = new SpecialShop(page, offset, row);
+        for (var i = 0; i < SpecialShop.Item.Count; i++)
         {
-            Entries.Add(new Entry
+            var item = SpecialShop.Item[i];
+            var itemEntry = new Entry();
+            itemEntry.Result = new List<ResultEntry>();
+            itemEntry.Cost = new List<CostEntry>();
+            for (var j = 0; j < item.ReceiveItems.Count; j++)
             {
-                Result = new List<ResultEntry> {
-                        new ResultEntry {
-                            Item = new LazyRow<ItemAdapter>(lumina, parser.ReadColumn<int>(1 + i), language),
-                            Count = parser.ReadColumn<uint>(61 + i),
-                            //SpecialShopItemCategory = new LazyRow<SpecialShopItemCategory>(lumina, parser.ReadColumn<int>(121 + i), language),
-                            HQ = parser.ReadColumn<bool>(181 + i)
-                        },
-                        new ResultEntry {
-                            Item = new LazyRow<ItemAdapter>(lumina, parser.ReadColumn<int>(241 + i), language),
-                            Count = parser.ReadColumn<uint>(301 + i),
-                            //SpecialShopItemCategory = new LazyRow<SpecialShopItemCategory>(lumina, parser.ReadColumn<int>(361 + i), language),
-                            HQ = parser.ReadColumn<bool>(421 + i)
-                        }
-                    },
-                Cost = new List<CostEntry> {
-                        new CostEntry {
-                            Item = new LazyRow<ItemAdapter>(lumina, FixItemId(parser.ReadColumn<int>(481 + i)), language),
-                            Count = parser.ReadColumn<uint>(541 + i),
-                            HQ = parser.ReadColumn<bool>(601 + i),
-                            Collectability = parser.ReadColumn<ushort>(661 + i)
-                        },
-                        new CostEntry {
-                            Item = new LazyRow<ItemAdapter>(lumina, FixItemId(parser.ReadColumn<int>(721 + i)), language),
-                            Count = parser.ReadColumn<uint>(781 + i),
-                            HQ = parser.ReadColumn<bool>(841 + i),
-                            Collectability = parser.ReadColumn<ushort>(901 + i)
-                        },
-                        new CostEntry {
-                            Item = new LazyRow<ItemAdapter>(lumina, FixItemId(parser.ReadColumn<int>(961 + i)), language),
-                            Count = parser.ReadColumn<uint>(1021 + i),
-                            HQ = parser.ReadColumn<bool>(1081 + i),
-                            Collectability = parser.ReadColumn<ushort>(1141 + i)
-                        }
-                    },
+                var receiveItem = item.ReceiveItems[j];
+                itemEntry.Result.Add(new ResultEntry
+                {
+                    Item = new RowRef<ItemAdapter>(page.Module, receiveItem.Item.RowId, page.Language),
+                    Count = receiveItem.ReceiveCount,
+                    HQ = receiveItem.ReceiveHq
+                });
             }
-            );
+            for (var j = 0; j < item.ItemCosts.Count; j++)
+            {
+                var itemCost = item.ItemCosts[j];
+                itemEntry.Cost.Add(new CostEntry
+                {
+                    Item = new RowRef<ItemAdapter>(page.Module, itemCost.ItemCost.RowId, page.Language),
+                    Count = itemCost.CurrencyCost,
+                    HQ = itemCost.HqCost > 0,
+                    Collectability = itemCost.CollectabilityCost
+                });
+            }
+            Entries.Add(itemEntry);
         }
 
     }
@@ -62,7 +54,7 @@ public class SpecialShopAdapter : SpecialShop
             return itemId;
         }
 
-        switch (UseCurrencyType)
+        switch (SpecialShop.UseCurrencyType)
         {
             // Scrips
             case 16:
@@ -97,15 +89,15 @@ public class SpecialShopAdapter : SpecialShop
     private static Dictionary<int, int> BuildTomestones()
     {
         var tomestoneItems = ExcelCache<TomestonesItem>.GetSheet()
-            .Where(t => t.Tomestones.Row > 0)
-            .OrderBy(t => t.Tomestones.Row)
+            .Where(t => t.Tomestones.RowId > 0)
+            .OrderBy(t => t.Tomestones.RowId)
             .ToArray();
 
         var tomeStones = new Dictionary<int, int>();
 
         for (var i = 0; i < tomestoneItems.Length; i++)
         {
-            tomeStones[i + 1] = (int)tomestoneItems[i].Item.Row;
+            tomeStones[i + 1] = (int)tomestoneItems[i].Item.RowId;
         }
 
         return tomeStones;
@@ -119,7 +111,7 @@ public class SpecialShopAdapter : SpecialShop
 
     public struct ResultEntry
     {
-        public LazyRow<ItemAdapter> Item;
+        public RowRef<ItemAdapter> Item;
         public uint Count;
         //public LazyRow<SpecialShopItemCategory> SpecialShopItemCategory;
         public bool HQ;
@@ -127,7 +119,7 @@ public class SpecialShopAdapter : SpecialShop
 
     public struct CostEntry
     {
-        public LazyRow<ItemAdapter> Item;
+        public RowRef<ItemAdapter> Item;
         public uint Count;
         public bool HQ;
         public ushort Collectability;

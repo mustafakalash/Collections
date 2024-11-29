@@ -1,13 +1,17 @@
 namespace Collections;
 
 [Sheet("ClassJobCategory")]
-public class ClassJobCategoryAdapter : ClassJobCategory
+public struct ClassJobCategoryAdapter : IExcelRow<ClassJobCategoryAdapter>
 {
+    ClassJobCategory ClassJobCategory { get; set; }
+    public uint RowId => ClassJobCategory.RowId;
     public List<Job> Jobs { get; set; }
 
-    public override void PopulateData(RowParser parser, Lumina.GameData lumina, Language language)
+    public static ClassJobCategoryAdapter Create(ExcelPage page, uint offset, uint row) => new(page, offset, row);
+
+    public ClassJobCategoryAdapter(ExcelPage page, uint offset, uint row)
     {
-        base.PopulateData(parser, lumina, language);
+        ClassJobCategory = new ClassJobCategory(page, offset, row);
         InitializeJobs();
     }
 
@@ -16,7 +20,7 @@ public class ClassJobCategoryAdapter : ClassJobCategory
         Jobs = new List<Job>();
         foreach (var job in GetEnumValues<Job>())
         {
-            if (this.GetProperty<bool>(job.GetEnumName()))
+            if (ClassJobCategory.GetProperty<bool>(job.GetEnumName()))
             {
                 Jobs.Add(job);
             }

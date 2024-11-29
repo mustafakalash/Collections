@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Concurrent;
+using FFXIVClientStructs.FFXIV.Component.Excel;
 
 namespace Collections;
 
-public class ExcelCache<T> : IEnumerable<T> where T : ExcelRow
+public class ExcelCache<T> : IEnumerable<T> where T : struct, IExcelRow<T>
 {
     private static ConcurrentDictionary<Dalamud.Game.ClientLanguage, ExcelCache<T>> InternalInstance = new();
 
@@ -47,18 +48,43 @@ public class ExcelCache<T> : IEnumerable<T> where T : ExcelRow
 
         //return rowCache[id] = result;
     }
+}
 
-    public T? GetRow(uint row, uint subRow)
+public class SubrowExcelCache<T> : IEnumerable<T> where T : struct, IExcelSubrow<T>
+{
+
+    private static ConcurrentDictionary<Dalamud.Game.ClientLanguage, SubrowExcelCache<T>> InternalInstance = new();
+
+    private SubrowExcelSheet<T> excelSheet { get; set; }
+    //private readonly ConcurrentDictionary<uint, T> rowCache = new();
+    //private readonly ConcurrentDictionary<Tuple<uint, uint>, T> subRowCache = new();
+
+    private SubrowExcelCache(Dalamud.Game.ClientLanguage language)
     {
-        return excelSheet.GetRow(row, subRow);
-        //var targetRow = new Tuple<uint, uint>(row, subRow);
+        excelSheet = Services.DataManager.GetSubrowExcelSheet<T>(language);
+    }
 
-        //if (subRowCache.TryGetValue(targetRow, out var value))
-        //{
-        //    return value;
-        //}
-        //if (excelSheet.GetRow(row, subRow) is not { } result) return null;
+    public static SubrowExcelCache<T> GetSheet(Dalamud.Game.ClientLanguage? language = null)
+    {
+        var sheetLanguage = language is not null ? (Dalamud.Game.ClientLanguage)language : Services.DataManager.Language;
+        if (InternalInstance.TryGetValue(sheetLanguage, out var instance))
+        {
+            return instance;
+        }
+        return InternalInstance[sheetLanguage] = new SubrowExcelCache<T>(sheetLanguage);
+    }
 
-        //return subRowCache[targetRow] = result;
+    public IEnumerator<T> GetEnumerator()
+    {
+        return excelSheet.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+    public T? GetRow(uint row, ushort subRow)
+    {
+        return excelSheet.GetSubrow(row, subRow);
     }
 }

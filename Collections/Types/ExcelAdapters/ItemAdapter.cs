@@ -1,22 +1,26 @@
 namespace Collections;
 
 [Sheet("Item")]
-public class ItemAdapter : Item
+public struct ItemAdapter : IExcelRow<ItemAdapter>
 {
+    public Item Item { get; set; }
+    public uint RowId => Item.RowId;
     public List<Job> Jobs { get; set; }
     public EquipSlot EquipSlot { get; set; }
     public bool IsEquipment { get; set; }
 
-    public override void PopulateData(RowParser parser, Lumina.GameData lumina, Language language)
+    public static ItemAdapter Create(ExcelPage page, uint offset, uint row) => new(page, offset, row);
+
+    public ItemAdapter(ExcelPage page, uint offset, uint row)
     {
-        base.PopulateData(parser, lumina, language);
+        Item = new Item(page, offset, row);
         InitializeEquipSlot();
         InitializeJobs();
     }
 
     public void InitializeEquipSlot()
     {
-        var equipSlotCategory = ExcelCache<EquipSlotCategoryAdapter>.GetSheet().GetRow(EquipSlotCategory.Row);
+        var equipSlotCategory = ExcelCache<EquipSlotCategoryAdapter>.GetSheet().GetRow(Item.EquipSlotCategory.RowId).Value;
         EquipSlot = equipSlotCategory.EquipSlot;
         IsEquipment = EquipSlot != EquipSlot.None;
     }
@@ -25,8 +29,7 @@ public class ItemAdapter : Item
     {
         if (IsEquipment)
         {
-            var classJobCategory = ExcelCache<ClassJobCategoryAdapter>.GetSheet().GetRow(ClassJobCategory.Row);
-            //Services.classJobCategorySheet[(int)ClassJobCategory.Value.RowId];
+            var classJobCategory = ExcelCache<ClassJobCategoryAdapter>.GetSheet().GetRow(Item.ClassJobCategory.RowId).Value;
             Jobs = classJobCategory.Jobs;
         } else
         {

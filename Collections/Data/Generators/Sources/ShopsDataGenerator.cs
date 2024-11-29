@@ -8,9 +8,9 @@ public class ShopsDataGenerator : BaseDataGenerator<Shop>
     private ExcelCache<ENpcBase> ENpcBaseSheet { get; set; }
     private ExcelCache<SpecialShopAdapter> SpecialShopEntitySheet { get; set; }
     private ExcelCache<CustomTalk> CustomTalkSheet { get; set; }
-    private ExcelCache<CustomTalkNestHandlers> CustomTalkNestHandlersSheet { get; set; }
+    private SubrowExcelCache<CustomTalkNestHandlers> CustomTalkNestHandlersSheet { get; set; }
     private ExcelCache<InclusionShop> InclusionShopSheet { get; set; }
-    private ExcelCache<InclusionShopSeries> InclusionShopSeriesSheet { get; set; }
+    private SubrowExcelCache<InclusionShopSeries> InclusionShopSeriesSheet { get; set; }
     private ExcelCache<TopicSelect> TopicSelectSheet { get; set; }
     private ExcelCache<PreHandler> PreHandlerSheet { get; set; }
 
@@ -21,9 +21,9 @@ public class ShopsDataGenerator : BaseDataGenerator<Shop>
         ENpcBaseSheet = ExcelCache<ENpcBase>.GetSheet();
         SpecialShopEntitySheet = ExcelCache<SpecialShopAdapter>.GetSheet();
         CustomTalkSheet = ExcelCache<CustomTalk>.GetSheet();
-        CustomTalkNestHandlersSheet = ExcelCache<CustomTalkNestHandlers>.GetSheet();
+        CustomTalkNestHandlersSheet = SubrowExcelCache<CustomTalkNestHandlers>.GetSheet();
         InclusionShopSheet = ExcelCache<InclusionShop>.GetSheet();
-        InclusionShopSeriesSheet = ExcelCache<InclusionShopSeries>.GetSheet();
+        InclusionShopSeriesSheet = SubrowExcelCache<InclusionShopSeries>.GetSheet();
         TopicSelectSheet = ExcelCache<TopicSelect>.GetSheet();
         PreHandlerSheet = ExcelCache<PreHandler>.GetSheet();
 

@@ -23,7 +23,7 @@ public class MinionCollectible : Collectible<Companion>, ICreateable<MinionColle
 
     protected override string GetName()
     {
-        return ExcelRow.Singular;
+        return ExcelRow.Singular.ToString();
     }
 
     protected override uint GetId()

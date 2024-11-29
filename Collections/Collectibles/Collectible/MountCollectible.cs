@@ -23,7 +23,7 @@ public class MountCollectible : Collectible<Mount>, ICreateable<MountCollectible
 
     protected override string GetName()
     {
-        return ExcelRow.Singular;
+        return ExcelRow.Singular.ToString();
     }
 
     protected override uint GetId()
@@ -33,7 +33,8 @@ public class MountCollectible : Collectible<Mount>, ICreateable<MountCollectible
 
     protected override string GetDescription()
     {
-        return ExcelCache<MountTransient>.GetSheet().GetRow(ExcelRow.RowId).Description.ToString();
+        ActionTransient? row = ExcelCache<ActionTransient>.GetSheet().GetRow(ExcelRow.RowId);
+        return row is not null ? row.Value.Description.ToString() : string.Empty;
     }
 
     protected override HintModule GetPrimaryHint()

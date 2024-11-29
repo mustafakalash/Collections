@@ -1,42 +1,36 @@
 namespace Collections;
 
 [Sheet("EquipSlotCategory")]
-public class EquipSlotCategoryAdapter : EquipSlotCategory
+public struct EquipSlotCategoryAdapter : IExcelRow<EquipSlotCategoryAdapter>
 {
+    public EquipSlotCategory EquipSlotCategory { get; set; }
+    public uint RowId => EquipSlotCategory.RowId;
     public EquipSlot EquipSlot { get; set; }
 
-    public override void PopulateData(RowParser parser, Lumina.GameData lumina, Language language)
+    public static EquipSlotCategoryAdapter Create(ExcelPage page, uint offset, uint row) => new(page, offset, row);
+
+    public EquipSlotCategoryAdapter(ExcelPage page, uint offset, uint row)
     {
-        base.PopulateData(parser, lumina, language);
+        EquipSlotCategory = new EquipSlotCategory(page, offset, row);
         EquipSlot = GetEquipSlot();
     }
 
     private EquipSlot GetEquipSlot()
     {
-        if (MainHand != 0)
+        if (EquipSlotCategory.MainHand != 0)
             return EquipSlot.MainHand;
-        if (OffHand != 0)
+        if (EquipSlotCategory.OffHand != 0)
             return EquipSlot.OffHand;
-        if (Head != 0)
+        if (EquipSlotCategory.Head != 0)
             return EquipSlot.Head;
-        if (Body != 0)
+        if (EquipSlotCategory.Body != 0)
             return EquipSlot.Body;
-        if (Gloves != 0)
+        if (EquipSlotCategory.Gloves != 0)
             return EquipSlot.Gloves;
-        if (Legs != 0)
+        if (EquipSlotCategory.Legs != 0)
             return EquipSlot.Legs;
-        if (Feet != 0)
+        if (EquipSlotCategory.Feet != 0)
             return EquipSlot.Feet;
         return EquipSlot.None;
-
-        // Can also handle this with reflections, doing it explicitly for now
-        //foreach (var equipSlot in GetEnumValues<EquipSlot>())
-        //{
-        //    if (this.GetProperty<sbyte>(equipSlot.GetEnumName()) != 0)
-        //    {
-        //        EquipSlot = equipSlot;
-        //        return;
-        //    }
-        //}
     }
 }

@@ -1,8 +1,10 @@
 namespace Collections;
 
 [Sheet("ClassJob")]
-public class ClassJobAdapter : ClassJob
+public struct ClassJobAdapter : IExcelRow<ClassJobAdapter>
 {
+    public ClassJob ClassJob { get; set; }
+    public uint RowId => ClassJob.RowId;
     public Job? Job { get; set; }
     public ClassRole ClassRole { get; set; }
     public int IconId { get; set; }
@@ -38,9 +40,10 @@ public class ClassJobAdapter : ClassJob
     };
 
     private IconHandler iconHandler { get; set; }
-    public override void PopulateData(RowParser parser, Lumina.GameData lumina, Language language)
+
+    public ClassJobAdapter(ExcelPage page, uint offset, uint row)
     {
-        base.PopulateData(parser, lumina, language);
+        ClassJob = new ClassJob(page, offset, row);
         if (ClassJobConfig.ContainsKey(RowId))
         {
             IconId = ClassJobConfig[RowId].iconId;
@@ -48,7 +51,7 @@ public class ClassJobAdapter : ClassJob
             ClassRole = ClassJobConfig[RowId].classRole;
         }
     }
-
+    public static ClassJobAdapter Create(ExcelPage page, uint offset, uint row) => new(page, offset, row);
     public ISharedImmediateTexture GetIconLazy()
     {
         iconHandler ??= new IconHandler(IconId);
