@@ -16,7 +16,7 @@ public class Monster
             return null;
         }
 
-        return new Location(ExcelCache<TerritoryType>.GetSheet().GetRow((uint)territoryId), (float)X, (float)Y);
+        return new Location(ExcelCache<TerritoryType>.GetSheet().GetRow((uint)territoryId).Value, (float)X, (float)Y);
     }
 }
 

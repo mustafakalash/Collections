@@ -33,7 +33,11 @@ public class MinionCollectible : Collectible<Companion>, ICreateable<MinionColle
 
     protected override string GetDescription()
     {
-        return ExcelCache<CompanionTransient>.GetSheet().GetRow(ExcelRow.RowId).Description.ToString();
+        var row = ExcelCache<CompanionTransient>.GetSheet().GetRow(ExcelRow.RowId);
+        if(row.HasValue) {
+            return row.Value.Description.ToString();
+        }
+        return "";
     }
 
     protected override HintModule GetPrimaryHint()

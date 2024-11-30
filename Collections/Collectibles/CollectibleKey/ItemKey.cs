@@ -6,7 +6,7 @@ public class ItemKey : CollectibleKey<(ItemAdapter, bool)>, ICreateable<ItemKey,
 
     public ItemKey((ItemAdapter, bool) input) : base(input)
     {
-        iconHandler = new IconHandler(input.Item1.Icon);
+        iconHandler = new IconHandler(input.Item1.Item.Icon);
     }
 
     public static ItemKey Create((ItemAdapter, bool) input)
@@ -16,7 +16,7 @@ public class ItemKey : CollectibleKey<(ItemAdapter, bool)>, ICreateable<ItemKey,
 
     protected override string GetName((ItemAdapter, bool) input)
     {
-        return input.Item1.Name;
+        return input.Item1.Item.Name.ToString();
     }
 
     protected override uint GetId((ItemAdapter, bool) input)
@@ -96,7 +96,7 @@ public class ItemKey : CollectibleKey<(ItemAdapter, bool)>, ICreateable<ItemKey,
 
     public override Tradeability GetIsTradeable()
     {
-        return !Input.Item1.IsUntradable ? Tradeability.Tradeable : Tradeability.UntradeableSingle;
+        return !Input.Item1.Item.IsUntradable ? Tradeability.Tradeable : Tradeability.UntradeableSingle;
     }
 
     private int? marketBoardPrice = null;

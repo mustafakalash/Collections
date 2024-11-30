@@ -3,7 +3,7 @@ namespace Collections;
 public class ShopSource : CollectibleSource
 {
     public List<(ItemKey collectibleKey, int amount)> costItems = new();
-    public ENpcResident ENpcResident { get; init; }
+    public ENpcResident? ENpcResident { get; init; }
     public uint ShopId { get; init; }
     public ShopSource(Shop shopEntry)
     {
@@ -30,9 +30,9 @@ public class ShopSource : CollectibleSource
         name = "";
 
         // NPC name
-        if (ENpcResident != null)
+        if (ENpcResident.HasValue)
         {
-            name += ENpcResident.Singular.ToString();
+            name += ENpcResident.Value.Singular.ToString();
         }
         else
         {
@@ -68,10 +68,10 @@ public class ShopSource : CollectibleSource
         sourceCategories = costItems.Select(cost => cost.collectibleKey).SelectMany(source => source.SourceCategories).ToList();
 
         // Add source type of beast tribe currencies TODO
-        if (ENpcResident != null)
+        if (ENpcResident.HasValue)
         {
             var beastTribeNpcIds = new List<uint>() { 1016650, 1016804, 1016838 };
-            if (beastTribeNpcIds.Contains(ENpcResident.RowId))
+            if (beastTribeNpcIds.Contains(ENpcResident.Value.RowId))
             {
                 sourceCategories.Add(SourceCategory.BeastTribes);
             }
@@ -105,14 +105,14 @@ public class ShopSource : CollectibleSource
 
         locationChecked = true;
 
-        if (ENpcResident == null)
+        if (!ENpcResident.HasValue)
         {
             return null;
         }
 
-        if (Services.DataGenerator.NpcLocationDataGenerator.npcToLocation.ContainsKey(ENpcResident.RowId))
+        if (Services.DataGenerator.NpcLocationDataGenerator.npcToLocation.ContainsKey(ENpcResident.Value.RowId))
         {
-            locationEntry = Services.DataGenerator.NpcLocationDataGenerator.npcToLocation[ENpcResident.RowId];
+            locationEntry = Services.DataGenerator.NpcLocationDataGenerator.npcToLocation[ENpcResident.Value.RowId];
         }
 
         return locationEntry;

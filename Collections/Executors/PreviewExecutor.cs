@@ -35,7 +35,7 @@ public unsafe class PreviewExecutor
 
     private void Preview(ItemAdapter item, byte stainId = 0, bool storePreviewHistory = true)
     {
-        Dev.Log($"Previewing {item.Name}");
+        Dev.Log($"Previewing {item.Item.Name}");
 
         if (storePreviewHistory)
             previewHistory.Add(item.EquipSlot);
@@ -71,8 +71,8 @@ public unsafe class PreviewExecutor
         {
             var invSlot = container->GetInventorySlot(i);
             var item = itemSheet.GetRow(invSlot->GlamourId != 0 ? invSlot->GlamourId : invSlot->ItemId);
-            if (previewHistory.Contains(item.EquipSlot))
-                Preview(item, invSlot->Stains[0], false);
+            if (previewHistory.Contains(item.Value.EquipSlot))
+                Preview(item.Value, invSlot->Stains[0], false);
         }
         previewHistory.Clear();
     }
@@ -130,9 +130,9 @@ public unsafe class PreviewExecutor
     {
         return new EquipmentModelId()
         {
-            Id = (ushort)item.ModelMain,
+            Id = (ushort)item.Item.ModelMain,
             Stain0 = stainId,
-            Variant = (byte)(item.ModelMain >> 16),
+            Variant = (byte)(item.Item.ModelMain >> 16),
         };
     }
 
@@ -140,10 +140,10 @@ public unsafe class PreviewExecutor
     {
         return new WeaponModelId()
         {
-            Id = (ushort)item.ModelMain,
-            Type = (byte)(item.ModelMain >> 16),
+            Id = (ushort)item.Item.ModelMain,
+            Type = (byte)(item.Item.ModelMain >> 16),
             Stain0 = stainId,
-            Variant = (byte)(item.ModelMain >> 32),
+            Variant = (byte)(item.Item.ModelMain >> 32),
         };
     }
 }

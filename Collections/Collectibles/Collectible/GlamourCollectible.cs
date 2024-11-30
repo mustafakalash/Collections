@@ -20,7 +20,7 @@ public class GlamourCollectible : Collectible<ItemAdapter>, ICreateable<GlamourC
 
     protected override string GetName()
     {
-        return ExcelRow.Name;
+        return ExcelRow.Item.Name.ToString();
     }
 
     protected override uint GetId()
@@ -35,12 +35,12 @@ public class GlamourCollectible : Collectible<ItemAdapter>, ICreateable<GlamourC
 
     protected override HintModule GetPrimaryHint()
     {
-        return new HintModule($"Lv. {ExcelRow.LevelEquip}", null);
+        return new HintModule($"Lv. {ExcelRow.Item.LevelEquip}", null);
     }
 
     protected override HintModule GetSecondaryHint()
     {
-        return new HintModule($"{ExcelRow.ClassJobCategory.Value.Name}", null);
+        return new HintModule($"{ExcelRow.Item.ClassJobCategory.Value.Name.ToString()}", null);
     }
 
     public override void UpdateObtainedState()
@@ -52,7 +52,7 @@ public class GlamourCollectible : Collectible<ItemAdapter>, ICreateable<GlamourC
 
     protected override int GetIconId()
     {
-        return ExcelRow.Icon;
+        return ExcelRow.Item.Icon;
     }
 
     public override void Interact()

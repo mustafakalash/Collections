@@ -183,7 +183,7 @@ public class GlamourTab : IDrawable
 
         // Order
         .OrderByDescending(c => c.IsFavorite())
-        .ThenByDescending(c => ((GlamourCollectible)c).ExcelRow.LevelEquip)
+        .ThenByDescending(c => ((GlamourCollectible)c).ExcelRow.Item.LevelEquip)
         .ThenByDescending(c => c.Name)
         .ToList();
     }

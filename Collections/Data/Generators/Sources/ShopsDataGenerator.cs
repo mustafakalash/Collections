@@ -54,9 +54,9 @@ public class ShopsDataGenerator : BaseDataGenerator<Shop>
         {
             foreach (var ENpcData in ENpcBase.ENpcData)
             {
-                NpcDataToNpcBase[ENpcData] = ENpcBase.RowId;
+                NpcDataToNpcBase[ENpcData.RowId] = ENpcBase.RowId;
 
-                var npcData = ENpcData;
+                var npcData = ENpcData.RowId;
                 if (npcData == 0)
                 {
                     continue;
@@ -65,27 +65,27 @@ public class ShopsDataGenerator : BaseDataGenerator<Shop>
                 // CustomTalk
                 if (MatchEventHandlerType(npcData, EventHandlerType.CustomTalk))
                 {
-                    var customTalk = CustomTalkSheet.GetRow(npcData);
-                    if (customTalk == null)
+                    var customTalkNullable = CustomTalkSheet.GetRow(npcData);
+                    if (!customTalkNullable.HasValue)
                     {
                         continue;
                     }
-
+                    var customTalk = customTalkNullable.Value;
 
                     // CustomTalk - SpecialLinks
-                    if (customTalk.SpecialLinks != 0)
+                    if (customTalk.SpecialLinks.RowId != 0)
                     {
                         try
                         {
-                            for (uint index = 0; index <= 30; index++)
+                            for (ushort index = 0; index <= 30; index++)
                             {
-                                var customTalkNestHandler = CustomTalkNestHandlersSheet.GetRow(customTalk.SpecialLinks, index);
+                                var customTalkNestHandler = CustomTalkNestHandlersSheet.GetRow(customTalk.SpecialLinks.RowId, index);
                                 if (customTalkNestHandler != null)
                                 {
-                                    var specialShop = SpecialShopEntitySheet.GetRow(customTalkNestHandler.NestHandler);
-                                    if (specialShop != null)
+                                    var specialShop = SpecialShopEntitySheet.GetRow(customTalkNestHandler.Value.NestHandler.RowId);
+                                    if (specialShop.HasValue)
                                     {
-                                        NpcDataToNpcBase[specialShop.RowId] = ENpcBase.RowId;
+                                        NpcDataToNpcBase[specialShop.Value.RowId] = ENpcBase.RowId;
                                     }
                                 }
                             }
@@ -94,51 +94,52 @@ public class ShopsDataGenerator : BaseDataGenerator<Shop>
                     }
 
                     // CustomTalk - ScriptArg
-                    foreach (var arg in customTalk.ScriptArg)
+                    foreach (var arg in customTalk.Script)
                     {
-                        if (arg < FirstSpecialShopId || arg > LastSpecialShopId)
+                        if (arg.ScriptArg < FirstSpecialShopId || arg.ScriptArg > LastSpecialShopId)
                         {
                             continue;
                         }
-                        var specialShop = SpecialShopEntitySheet.GetRow(arg);
+                        var specialShop = SpecialShopEntitySheet.GetRow(arg.ScriptArg);
                         if (specialShop != null)
                         {
-                            NpcDataToNpcBase[specialShop.RowId] = ENpcBase.RowId;
+                            NpcDataToNpcBase[specialShop.Value.RowId] = ENpcBase.RowId;
                         }
                     }
                 }
 
                 // InclusionShops
-                var inclusionShop = InclusionShopSheet.GetRow(npcData);
+                var inclusionShop = InclusionShopSheet.GetRow(npcData).Value;
                 addInclusionShop(inclusionShop, ENpcBase.RowId);
 
                 // PreHandler
-                var preHandler = PreHandlerSheet.GetRow(npcData);
+                var preHandler = PreHandlerSheet.GetRow(npcData).Value;
                 addPreHandler(preHandler, ENpcBase.RowId);
 
                 // TopicSelect
-                var topicSelect = TopicSelectSheet.GetRow(npcData);
-                if (topicSelect != null)
+                var topicSelectNullable = TopicSelectSheet.GetRow(npcData);
+                if (topicSelectNullable.HasValue)
                 {
+                    var topicSelect = topicSelectNullable.Value;
                     foreach (var data in topicSelect.Shop)
                     {
-                        if (data == 0)
+                        if (data.RowId == 0)
                         {
                             continue;
                         }
 
-                        if (MatchEventHandlerType(data, EventHandlerType.SpecialShop))
+                        if (MatchEventHandlerType(data.RowId, EventHandlerType.SpecialShop))
                         {
-                            var specialShop = SpecialShopEntitySheet.GetRow(data);
-                            if (specialShop != null)
+                            var specialShop = SpecialShopEntitySheet.GetRow(data.RowId);
+                            if (specialShop.HasValue)
                             {
-                                NpcDataToNpcBase[specialShop.RowId] = ENpcBase.RowId;
+                                NpcDataToNpcBase[specialShop.Value.RowId] = ENpcBase.RowId;
                             }
                             continue;
                         }
 
                         // TopicSelect -> PreHandler
-                        preHandler = PreHandlerSheet.GetRow(data);
+                        preHandler = PreHandlerSheet.GetRow(data.RowId).Value;
                         addPreHandler(preHandler, ENpcBase.RowId);
                     }
                 }
@@ -180,14 +181,14 @@ public class ShopsDataGenerator : BaseDataGenerator<Shop>
         return ((data >> 16) & (uint)type) == (uint)type;
     }
 
-    private void addPreHandler(PreHandler preHandler, uint ENpcBaseId)
+    private void addPreHandler(PreHandler? preHandler, uint ENpcBaseId)
     {
-        if (preHandler == null)
+        if (!preHandler.HasValue)
         {
             return;
         }
 
-        var target = preHandler.Target;
+        var target = preHandler.Value.Target.RowId;
         if (target == 0)
         {
             return;
@@ -196,9 +197,9 @@ public class ShopsDataGenerator : BaseDataGenerator<Shop>
         if (MatchEventHandlerType(target, EventHandlerType.SpecialShop))
         {
             var specialShop = SpecialShopEntitySheet.GetRow(target);
-            if (specialShop != null)
+            if (specialShop.HasValue)
             {
-                NpcDataToNpcBase[specialShop.RowId] = ENpcBaseId;
+                NpcDataToNpcBase[specialShop.Value.RowId] = ENpcBaseId;
             }
             return;
         }
@@ -207,34 +208,34 @@ public class ShopsDataGenerator : BaseDataGenerator<Shop>
         addInclusionShop(inclusionShop, ENpcBaseId);
     }
 
-    private void addInclusionShop(InclusionShop inclusionShop, uint ENpcBaseId)
+    private void addInclusionShop(InclusionShop? inclusionShop, uint ENpcBaseId)
     {
-        if (inclusionShop == null)
+        if (!inclusionShop.HasValue)
         {
             return;
         }
 
-        foreach (var category in inclusionShop.Category)
+        foreach (var category in inclusionShop.Value.Category)
         {
             if (category.Value.RowId == 0)
             {
                 continue;
             }
 
-            for (uint i = 0; ; i++)
+            for (ushort i = 0; ; i++)
             {
                 try
                 {
-                    var series = InclusionShopSeriesSheet.GetRow(category.Value.InclusionShopSeries.Row, i);
-                    if (series == null)
+                    var series = InclusionShopSeriesSheet.GetRow(category.Value.InclusionShopSeries.RowId, i);
+                    if (!series.HasValue)
                     {
                         break;
                     }
 
-                    var specialShop = SpecialShopEntitySheet.GetRow(series.SpecialShop.Row);
-                    if (specialShop != null)
+                    var specialShop = SpecialShopEntitySheet.GetRow(series.Value.SpecialShop.RowId);
+                    if (specialShop.HasValue)
                     {
-                        NpcDataToNpcBase[specialShop.RowId] = ENpcBaseId;
+                        NpcDataToNpcBase[specialShop.Value.RowId] = ENpcBaseId;
                     }
                 }
                 catch (Exception)
@@ -249,7 +250,7 @@ public class ShopsDataGenerator : BaseDataGenerator<Shop>
     {
         //Dev.Start();
         var gilShopSheet = ExcelCache<GilShop>.GetSheet()!;
-        var gilShopItemSheet = ExcelCache<GilShopItem>.GetSheet()!;
+        var gilShopItemSheet = SubrowExcelCache<GilShopItem>.GetSheet()!;
         var gilItem = ItemSheet.GetRow((uint)Currency.Gil);
         foreach (var gilShop in gilShopSheet)
         {
@@ -258,7 +259,7 @@ public class ShopsDataGenerator : BaseDataGenerator<Shop>
                 continue;
             }
 
-            for (uint i = 0; i < 100; i++)
+            for (ushort i = 0; i < 100; i++)
             {
                 try
                 {
@@ -275,9 +276,9 @@ public class ShopsDataGenerator : BaseDataGenerator<Shop>
                     {
                         ENpcBaseId = GetNpcBaseFromNpcData(ENpcDataId);
                     }
-                    var costList = new List<(ItemAdapter Item, int Amount)> { (gilItem, (int)item.PriceMid) };
+                    var costList = new List<(ItemAdapter Item, int Amount)> { (gilItem.Value, (int)item.Value.PriceMid) };
                     var shopEntry = new Shop(costList, ENpcBaseId, gilShop.RowId);
-                    AddEntry(item.RowId, shopEntry);
+                    AddEntry(item.Value.RowId, shopEntry);
                 }
                 catch
                 {
@@ -293,12 +294,12 @@ public class ShopsDataGenerator : BaseDataGenerator<Shop>
         //Dev.Start();
         var GCShopSheet = ExcelCache<GCShop>.GetSheet()!; // 4 rows
         var GCScripShopCategorySheet = ExcelCache<GCScripShopCategory>.GetSheet()!; // 31 rows
-        var GCScripShopItemSheet = ExcelCache<GCScripShopItem>.GetSheet()!; // 36.x
+        var GCScripShopItemSheet = SubrowExcelCache<GCScripShopItem>.GetSheet()!; // 36.x
         var GCItem = ItemSheet.GetRow((uint)Currency.CompanySeals);
 
         foreach (var gcShop in GCShopSheet)
         {
-            var gcShopCategories = GCScripShopCategorySheet.Where(i => i.GrandCompany.Row == gcShop.GrandCompany.Row).ToList();
+            var gcShopCategories = GCScripShopCategorySheet.Where(i => i.GrandCompany.RowId == gcShop.GrandCompany.RowId).ToList();
             if (gcShopCategories.Count == 0)
             {
                 return;
@@ -306,7 +307,7 @@ public class ShopsDataGenerator : BaseDataGenerator<Shop>
 
             foreach (var category in gcShopCategories)
             {
-                for (var i = 0u; ; i++)
+                for (ushort i = 0; ; i++)
                 {
                     try
                     {
@@ -316,17 +317,17 @@ public class ShopsDataGenerator : BaseDataGenerator<Shop>
                             break;
                         }
 
-                        var item = GCScripShopItem.Item.Value;
-                        if (item == null)
+                        var item = GCScripShopItem.Value.Item.ValueNullable;
+                        if (!item.HasValue)
                         {
                             break;
                         }
 
                         var ENpcDataId = gcShop.RowId;
                         var ENpcBaseId = GetNpcBaseFromNpcData(ENpcDataId);
-                        var costList = new List<(ItemAdapter Item, int Amount)> { (GCItem, (int)item.PriceMid) };
+                        var costList = new List<(ItemAdapter Item, int Amount)> { (GCItem.Value, (int)item.Value.PriceMid) };
                         var shopEntry = new Shop(costList, ENpcBaseId, gcShop.RowId);
-                        AddEntry(item.RowId, shopEntry);
+                        AddEntry(item.Value.RowId, shopEntry);
                     }
                     catch (Exception)
                     {
@@ -361,7 +362,7 @@ public class ShopsDataGenerator : BaseDataGenerator<Shop>
 
                 foreach (var cost in entry.Cost)
                 {
-                    if (cost.Item.Row == 0)
+                    if (cost.Item.RowId == 0)
                     {
                         continue;
                     }

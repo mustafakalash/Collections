@@ -13,7 +13,7 @@ public class CollectibleKeyFactory
         if (type == typeof(ItemAdapter))
         {
             var item = ExcelCache<ItemAdapter>.GetSheet().GetRow(id);
-            return CollectibleKeyCache<ItemKey, ItemAdapter>.Instance.GetObject((item, true));
+            return CollectibleKeyCache<ItemKey, ItemAdapter>.Instance.GetObject((item.Value, true));
         }
 
         if (keysDataGenerator.collectibleIdToItem.TryGetValue(type, out var itemDict))
@@ -51,7 +51,7 @@ public class CollectibleKeyFactory
                 return new MiscKey((misc, false));
             }
         }
-        if (type == typeof(Lumina.Excel.GeneratedSheets.Action))
+        if (type == typeof(Lumina.Excel.Sheets.Action))
         {
             if (Services.DataGenerator.KeysDataGenerator.ActionIdToBlueSpell.TryGetValue(id, out var monster))
             {

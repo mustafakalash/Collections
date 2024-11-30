@@ -96,7 +96,7 @@ public unsafe class DresserObserver
         var initialItemCount = ArmoireItemIds.Count;
         ArmoireItemIds.Clear();
 
-        var cabinetSheet = ExcelCache<Lumina.Excel.GeneratedSheets.Cabinet>.GetSheet();
+        var cabinetSheet = ExcelCache<Lumina.Excel.Sheets.Cabinet>.GetSheet();
         foreach (var cabinet in cabinetSheet)
         {
             if (Cabinet.IsItemInCabinet((int)cabinet.RowId))

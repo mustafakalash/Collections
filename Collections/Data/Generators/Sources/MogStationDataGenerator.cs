@@ -1,4 +1,5 @@
 using LuminaSupplemental.Excel.Model;
+using LuminaSupplemental.Excel.Services;
 
 namespace Collections;
 
@@ -8,7 +9,7 @@ public class MogStationDataGenerator : BaseDataGenerator<uint>
     protected override void InitializeData()
     {
         // Based on LuminaSupplemental
-        var StoreItemList = CsvLoader.LoadResource<StoreItem>(CsvLoader.StoreItemResourceName, out var failedLines);
+        var StoreItemList = CsvLoader.LoadResource<StoreItem>(CsvLoader.StoreItemResourceName, out var failedLines, out var exceptions);
         foreach (var entry in StoreItemList)
         {
             AddEntry(entry.ItemId, 0);
@@ -22,11 +23,11 @@ public class MogStationDataGenerator : BaseDataGenerator<uint>
         }
 
         // FittingShopCategoryItem sheet
-        var FittingShopCategoryItemSheet = ExcelCache<FittingShopCategoryItem>.GetSheet()!;
+        var FittingShopCategoryItemSheet = SubrowExcelCache<FittingShopCategoryItem>.GetSheet()!;
 
         foreach (var FittingShopCategoryItem in FittingShopCategoryItemSheet)
         {
-            var itemId = Convert.ToUInt32(FittingShopCategoryItem.Unknown0);
+            var itemId = Convert.ToUInt32(FittingShopCategoryItem.First().Unknown0);
             AddEntry(itemId, 0);
         }
 

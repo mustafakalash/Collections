@@ -136,7 +136,7 @@ public class EquipSlotsWidget
 
                 // Details on hover
                 ImGui.BeginTooltip();
-                var stainName = paletteWidgets[equipSlot].ActiveStain.RowId == 0 ? "No Dye Selected" : paletteWidgets[equipSlot].ActiveStain.Name;
+                var stainName = paletteWidgets[equipSlot].ActiveStain.RowId == 0 ? "No Dye Selected" : paletteWidgets[equipSlot].ActiveStain.Stain.Name.ToString();
                 ImGui.Text(stainName);
                 ImGui.EndTooltip();
 

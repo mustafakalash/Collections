@@ -24,7 +24,7 @@ public unsafe class PlatesExecutor
             // Look up in Dresser
             if (Services.ItemFinder.IsItemInDresser(item.RowId))
             {
-                Dev.Log($"Found {item.Name} ({item.RowId}) in Dresser, Adding to plate with stain: {stainId}");
+                Dev.Log($"Found {item.Item.Name.ToString()} ({item.RowId}) in Dresser, Adding to plate with stain: {stainId}");
                 var index = Services.DresserObserver.DresserItemIds.IndexOf(item.RowId);
                 SetPlateItem(PlateItemSource.Dresser, index, item.RowId, stainId);
             }
@@ -32,12 +32,12 @@ public unsafe class PlatesExecutor
             // Look up in Armoire
             else if (Services.ItemFinder.IsItemInArmoireCache(item.RowId))
             {
-                Dev.Log($"Found {item.Name} ({item.RowId}) in Armoire, Adding to plate with stain: {stainId}");
+                Dev.Log($"Found {item.Item.Name.ToString()} ({item.RowId}) in Armoire, Adding to plate with stain: {stainId}");
 
                 // Checking Armoire Loaded since it's not always loaded when in plates window
                 if (!Services.DresserObserver.IsArmoireLoaded())
                 {
-                    Dev.Log($"Armoire not loaded, not applying {item.Name} ({item.RowId}) to plate");
+                    Dev.Log($"Armoire not loaded, not applying {item.Item.Name.ToString()} ({item.RowId}) to plate");
                 }
                 var cabinetId = (int)Services.ItemFinder.CabinetIdFromItemId(item.RowId);
                 SetPlateItem(PlateItemSource.Armoire, cabinetId, item.RowId, stainId);
@@ -45,7 +45,7 @@ public unsafe class PlatesExecutor
 
             else
             {
-                Dev.Log($"Couldn't find {item.Name} in Dresser or Armoire");
+                Dev.Log($"Couldn't find {item.Item.Name.ToString()} in Dresser or Armoire");
             }
         }
         catch (Exception e)

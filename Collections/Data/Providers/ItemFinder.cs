@@ -14,14 +14,14 @@ public unsafe class ItemFinder
 
     public uint? CabinetIdFromItemId(uint itemId)
     {
-        var cabinetItem = ExcelCache<Lumina.Excel.GeneratedSheets.Cabinet>.GetSheet().Where(entry => entry.Item.Row == itemId).FirstOrDefault();
-        return cabinetItem is not null ? cabinetItem.RowId : null;
+        var cabinetItem = ExcelCache<Lumina.Excel.Sheets.Cabinet>.GetSheet().Where(entry => entry.Item.RowId == itemId).FirstOrDefault();
+        return cabinetItem.RowId;
     }
 
     public uint? ItemIdFromCabinetId(uint cabinetId)
     {
-        var cabinetItem = ExcelCache<Lumina.Excel.GeneratedSheets.Cabinet>.GetSheet().GetRow(cabinetId);
-        return cabinetItem is not null ? cabinetItem.Item.Row : null;
+        var cabinetItem = ExcelCache<Lumina.Excel.Sheets.Cabinet>.GetSheet().GetRow(cabinetId);
+        return cabinetItem is not null ? cabinetItem.Value.Item.RowId : null;
     }
 
     public bool IsItemInDresser(uint itemId)

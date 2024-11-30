@@ -50,7 +50,7 @@ public class ExcelCache<T> : IEnumerable<T> where T : struct, IExcelRow<T>
     }
 }
 
-public class SubrowExcelCache<T> : IEnumerable<T> where T : struct, IExcelSubrow<T>
+public class SubrowExcelCache<T> : IEnumerable<SubrowCollection<T>> where T : struct, IExcelSubrow<T>
 {
 
     private static ConcurrentDictionary<Dalamud.Game.ClientLanguage, SubrowExcelCache<T>> InternalInstance = new();
@@ -74,7 +74,7 @@ public class SubrowExcelCache<T> : IEnumerable<T> where T : struct, IExcelSubrow
         return InternalInstance[sheetLanguage] = new SubrowExcelCache<T>(sheetLanguage);
     }
 
-    public IEnumerator<T> GetEnumerator()
+    public IEnumerator<SubrowCollection<T>> GetEnumerator()
     {
         return excelSheet.GetEnumerator();
     }

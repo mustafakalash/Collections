@@ -133,17 +133,17 @@ public class DataDebugExporter
         {
             var isShop = source is ShopSource;
             ShopSource shopSource = null;
-            ENpcResident npc = null;
+            ENpcResident? npc = null;
             if (isShop)
             {
                 shopSource = (ShopSource)source;
-                npc = shopSource.ENpcResident;
+                npc = shopSource.ENpcResident.Value;
             }
 
             var Name = source.GetName();
             var Type = source.GetType().Name;
-            uint? NpcId = npc is not null ? npc.RowId : null;
-            var NpcName = npc is not null ? npc.Singular : "";
+            uint? NpcId = npc is not null ? npc?.RowId : null;
+            var NpcName = npc is not null ? npc?.Singular : "";
             uint? ShopId = isShop ? shopSource.ShopId : null;
             var LocationNotFound = isShop && !source.GetIslocatable();
             var NpcNotFound = isShop && npc is null;
@@ -153,7 +153,7 @@ public class DataDebugExporter
                 Name = Name,
                 Type = Type,
                 NpcId = NpcId,
-                NpcName = NpcName,
+                NpcName = NpcName.ToString(),
                 ShopId = ShopId,
                 LocationNotFound = LocationNotFound,
                 NpcNotFound = NpcNotFound,
@@ -182,9 +182,9 @@ public class DataDebugExporter
                 var name = source.GetName();
                 var locatable = shopSource.GetIslocatable();
                 var npcResident = shopSource.ENpcResident;
-                var NpcId = npcResident is not null ? npcResident.RowId : 0;
+                var NpcId = npcResident is not null ? npcResident?.RowId : 0;
                 var validNpc = npcResident is not null;
-                var npcName = npcResident is not null ? npcResident.Singular.ToString() : "";
+                var npcName = npcResident is not null ? npcResident?.Singular.ToString() : "";
                 var shopId = shopSource.ShopId;
 
                 var costIndicator = shopSource.costItems.First().collectibleKey.Id;
@@ -208,15 +208,15 @@ public class DataDebugExporter
                     var name = source.GetName();
                     var locatable = shopSource.GetIslocatable();
                     var npcResident = shopSource.ENpcResident;
-                    var NpcId = npcResident is not null ? npcResident.RowId : 0;
+                    var NpcId = npcResident is not null ? npcResident?.RowId : 0;
                     var validNpc = npcResident is not null;
-                    var npcName = npcResident is not null ? npcResident.Singular.ToString() : "";
+                    var npcName = npcResident is not null ? npcResident?.Singular.ToString() : "";
                     var shopId = shopSource.ShopId;
                     var dataObj = new ShopData()
                     {
                         itemId = collectible.CollectibleKey.Id,
                         itemName = collectible.CollectibleKey.Name,
-                        npcId = NpcId,
+                        npcId = NpcId.Value,
                         npcName = npcName,
                         validNpc = validNpc,
                         locatableNpc = locatable,

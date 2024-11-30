@@ -15,7 +15,7 @@ public class UniversalisClient
         Timeout = TimeSpan.FromMilliseconds(10000)
     };
 
-    private World homeWorld = Services.ClientState.LocalPlayer?.CurrentWorld.GameData;
+    private World homeWorld = Services.ClientState.LocalPlayer.CurrentWorld.Value;
 
     public void Dispose()
     {
@@ -31,9 +31,9 @@ public class UniversalisClient
     }
     public async Task<MarketplaceItemData?> GetMarketBoardData(uint itemId)
     {
-        homeWorld ??= Services.ClientState.LocalPlayer?.CurrentWorld.GameData;
-        var worldData = await GetMarketBoardDataInternal(itemId, homeWorld.Name);
-        var DCData = await GetMarketBoardDataInternal(itemId, homeWorld.DataCenter.Value.Name);
+        homeWorld = Services.ClientState.LocalPlayer.CurrentWorld.Value;
+        var worldData = await GetMarketBoardDataInternal(itemId, homeWorld.Name.ToString());
+        var DCData = await GetMarketBoardDataInternal(itemId, homeWorld.DataCenter.Value.Name.ToString());
         return ParseMarketplaceItemData(worldData, DCData);
     }
 

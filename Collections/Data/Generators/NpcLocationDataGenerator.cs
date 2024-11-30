@@ -1,6 +1,7 @@
 using Lumina.Data.Files;
 using Lumina.Data.Parsing.Layer;
 using LuminaSupplemental.Excel.Model;
+using LuminaSupplemental.Excel.Services;
 
 namespace Collections;
 
@@ -28,18 +29,18 @@ public class NpcLocationDataGenerator
             }
 
             // Skip already mapped
-            if (npcToLocation.ContainsKey(npcRowId))
+            if (npcToLocation.ContainsKey(npcRowId.RowId))
             {
                 continue;
             }
 
             // No territory specified
-            if (level.Territory.Value == null)
+            if (level.Territory.ValueNullable == null)
             {
                 continue;
             }
 
-            npcToLocation[npcRowId] = new Location(level.Territory.Value, level.X, level.Z);
+            npcToLocation[npcRowId.RowId] = new Location(level.Territory.Value, level.X, level.Z);
 
         }
 
@@ -83,7 +84,7 @@ public class NpcLocationDataGenerator
         }
 
         // Inject from CSV
-        var eNpcPlaces = CsvLoader.LoadResource<ENpcPlace>(CsvLoader.ENpcPlaceResourceName, out var failedLines);
+        var eNpcPlaces = CsvLoader.LoadResource<ENpcPlace>(CsvLoader.ENpcPlaceResourceName, out var failedLines, out var exceptions);
         foreach (var entry in eNpcPlaces)
         {
             if (npcToLocation.ContainsKey(entry.ENpcResidentId))
@@ -97,7 +98,7 @@ public class NpcLocationDataGenerator
                 continue;
             }
 
-            npcToLocation[entry.ENpcResidentId] = new Location(territoryType, entry.Position.X, entry.Position.Y);
+            npcToLocation[entry.ENpcResidentId] = new Location(territoryType.Value, entry.Position.X, entry.Position.Y);
         }
 
         // Inject from manual overrides
@@ -114,7 +115,7 @@ public class NpcLocationDataGenerator
                 continue;
             }
 
-            npcToLocation[npcId] = new Location(territoryType, (float)X, (float)Y);
+            npcToLocation[npcId] = new Location(territoryType.Value, (float)X, (float)Y);
         }
     }
 }
